@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { WorkoutLog, UserProfile, Exercise } from '../types';
 import { WORKOUTS_PROGRAM } from '../data/initialData';
+import { getMuscleGroupsFromLog, getExerciseLogSummary } from '../utils/workoutHelpers';
 import {
   ResponsiveContainer,
   LineChart,
@@ -12,15 +13,29 @@ import {
   BarChart,
   Bar,
 } from 'recharts';
-import { LineChart as LineChartIcon, Calendar, TrendingUp, BarChart3, Dumbbell, ShieldCheck } from 'lucide-react';
+import {
+  LineChart as LineChartIcon,
+  Calendar,
+  TrendingUp,
+  BarChart3,
+  Dumbbell,
+  ShieldCheck,
+  History,
+  Share2,
+  Flame,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 
 interface AnalyticsViewProps {
   logs: WorkoutLog[];
   user: UserProfile;
+  onOpenShareModal?: (log: WorkoutLog) => void;
 }
 
-export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ logs, user }) => {
+export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ logs, user, onOpenShareModal }) => {
   const [timeRange, setTimeRange] = useState<'30' | '60' | '90'>('60');
+  const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
   // Seleção de exercício para gráfico de evolução de carga
   const [selectedExerciseId, setSelectedExerciseId] = useState<string>('agachamento_goblet');
@@ -324,6 +339,140 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ logs, user }) => {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Histórico Completo de Treinos Salvos */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold">Registros Salvos</p>
+            <h3 className="text-xl font-black uppercase italic text-white flex items-center gap-2">
+              <History className="w-5 h-5 text-green-500" />
+              Histórico de Treinos Realizados ({logs.length})
+            </h3>
+            <p className="text-xs text-zinc-400 font-medium">
+              Todos os seus treinos concluídos com grupos musculares e lista de exercícios.
+            </p>
+          </div>
+        </div>
+
+        {logs.length === 0 ? (
+          <div className="p-8 text-center text-zinc-500 font-bold uppercase text-xs border border-dashed border-zinc-800 rounded-2xl">
+            Nenhum treino salvo ainda. Conclua uma sessão para ver seu histórico aqui!
+          </div>
+        ) : (
+          <div className="space-y-3 pt-2">
+            {[...logs]
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+              .map((log) => {
+                const muscleGroups = getMuscleGroupsFromLog(log);
+                const isExpanded = expandedLogId === log.id;
+                const formattedDate = new Date(log.date + 'T12:00:00').toLocaleDateString('pt-BR', {
+                  weekday: 'short',
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                });
+
+                return (
+                  <div
+                    key={log.id}
+                    className="bg-zinc-950 border border-zinc-800 hover:border-zinc-700 rounded-2xl p-4 space-y-3 transition-all"
+                  >
+                    {/* Topo do Log: Data, Título, Métricas & Botão de Compartilhar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold bg-zinc-900 px-2.5 py-0.5 rounded-lg border border-zinc-800">
+                            {formattedDate}
+                          </span>
+                          <span className="text-[10px] font-black uppercase text-green-400">
+                            {log.durationMinutes} min
+                          </span>
+                        </div>
+                        <h4 className="text-base font-black uppercase text-white tracking-tight italic">
+                          {log.workoutName}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs font-black italic text-zinc-300 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
+                          {log.totalVolumeKg.toLocaleString('pt-BR')} kg
+                        </span>
+
+                        {onOpenShareModal && (
+                          <button
+                            onClick={() => onOpenShareModal(log)}
+                            className="bg-green-500 hover:bg-green-400 text-black font-black uppercase tracking-wider text-[11px] px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-green-500/10"
+                            title="Gerar Card para Redes Sociais"
+                          >
+                            <Share2 className="w-3.5 h-3.5" />
+                            Postar
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => setExpandedLogId(isExpanded ? null : log.id)}
+                          className="bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white p-1.5 rounded-xl border border-zinc-800 transition-all"
+                          title="Ver Exercícios"
+                        >
+                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Grupos Musculares Trabalhados */}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] uppercase font-bold text-zinc-500 flex items-center gap-1">
+                        <Flame className="w-3 h-3 text-green-500" />
+                        Músculos:
+                      </span>
+                      {muscleGroups.map((group) => (
+                        <span
+                          key={group}
+                          className="text-[10px] font-black uppercase bg-zinc-900 text-green-400 border border-green-500/30 px-2.5 py-0.5 rounded-full"
+                        >
+                          {group}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Detalhes Expansíveis dos Exercícios */}
+                    {isExpanded && (
+                      <div className="pt-3 border-t border-zinc-900 space-y-2 animate-in fade-in-50">
+                        <span className="text-[10px] font-bold uppercase text-zinc-500 tracking-wider block">
+                          Exercícios Realizados:
+                        </span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {(log.exercises || []).map((ex, idx) => {
+                            const { setsCompleted, maxWeight, repsAtMax } = getExerciseLogSummary(ex);
+                            return (
+                              <div
+                                key={idx}
+                                className="bg-zinc-900/80 border border-zinc-800 p-2.5 rounded-xl flex items-center justify-between text-xs"
+                              >
+                                <span className="font-bold text-zinc-200 truncate pr-2">
+                                  {ex.exerciseName}
+                                </span>
+                                <div className="flex items-center gap-1.5 text-[11px] font-mono shrink-0">
+                                  <span className="text-zinc-400 font-bold">{setsCompleted} series</span>
+                                  {maxWeight > 0 && (
+                                    <span className="text-green-400 font-black bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20">
+                                      {maxWeight}kg x {repsAtMax}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
+        )}
       </div>
     </div>
   );

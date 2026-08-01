@@ -1,0 +1,6 @@
+{
+  "name": "Treinologia",
+  "description": "Aplicativo de treinos Treinologia com foco em hipertrofia, sobrecarga progressiva e recuperação de LCA pós-cirurgia.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

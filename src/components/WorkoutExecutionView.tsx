@@ -18,6 +18,11 @@ import {
   AlternativeExercise,
 } from '../data/exerciseAlternatives';
 import { playCheckSound, playTimerAlertSound } from '../utils/audio';
+import {
+  getMuscleGroupsFromLog,
+  getExerciseLogSummary,
+  formatWorkoutShareText,
+} from '../utils/workoutHelpers';
 import confetti from 'canvas-confetti';
 import {
   Check,
@@ -34,6 +39,8 @@ import {
   Share2,
   Dumbbell,
   Search,
+  Copy,
+  Flame,
 } from 'lucide-react';
 
 interface WorkoutExecutionViewProps {
@@ -284,6 +291,7 @@ export const WorkoutExecutionView: React.FC<WorkoutExecutionViewProps> = ({
       finalExercisesLogs.push({
         exerciseId: ex.id,
         exerciseName: ex.name,
+        muscleGroup: ex.muscleGroup,
         sets: exState.sets,
         rpe: exState.rpe,
         notes: exState.notes,
@@ -692,32 +700,78 @@ export const WorkoutExecutionView: React.FC<WorkoutExecutionViewProps> = ({
 
       {/* Modal de Conclusão do Treino */}
       {completedLogModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-green-500/60 rounded-3xl max-w-md w-full p-8 text-center space-y-6 shadow-2xl animate-in zoom-in-95">
-            <div className="w-16 h-16 rounded-2xl bg-green-500/20 text-green-400 flex items-center justify-center mx-auto border border-green-500/40">
-              <Sparkles className="w-8 h-8" />
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-zinc-900 border border-green-500/60 rounded-3xl max-w-lg w-full p-6 text-center space-y-5 shadow-2xl animate-in zoom-in-95 my-auto max-h-[90vh] flex flex-col">
+            <div className="w-14 h-14 rounded-2xl bg-green-500/20 text-green-400 flex items-center justify-center mx-auto border border-green-500/40 shrink-0">
+              <Sparkles className="w-7 h-7" />
             </div>
 
-            <div className="space-y-1">
-              <h3 className="text-3xl font-black uppercase italic text-white">Treino Concluído! 🎉</h3>
-              <p className="text-xs text-zinc-400 font-bold uppercase tracking-wider">
-                Excelente trabalho! Seu registro de treino foi salvo com sucesso.
+            <div className="space-y-1 shrink-0">
+              <h3 className="text-2xl sm:text-3xl font-black uppercase italic text-white">Treino Concluído! 🎉</h3>
+              <p className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">
+                Seu registro de treino foi salvo com sucesso na sua conta!
               </p>
             </div>
 
-            {/* Resumo das Métricas */}
-            <div className="bg-zinc-950 p-5 rounded-2xl border border-zinc-800 grid grid-cols-2 gap-3 text-left">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest block">Volume Total</span>
-                <span className="text-xl font-black italic text-green-400">{completedLogModal.totalVolumeKg} kg</span>
+            <div className="overflow-y-auto space-y-4 pr-1 grow">
+              {/* Grupos Musculares Malhados */}
+              <div className="bg-zinc-950 p-3.5 rounded-2xl border border-zinc-800 text-left space-y-1.5">
+                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 flex items-center gap-1">
+                  <Flame className="w-3.5 h-3.5 text-green-400" />
+                  Grupos Musculares Malhados:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {getMuscleGroupsFromLog(completedLogModal).map((group) => (
+                    <span
+                      key={group}
+                      className="text-xs font-black uppercase bg-green-500 text-black px-3 py-0.5 rounded-xl shadow-sm"
+                    >
+                      {group}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div>
-                <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest block">Duração</span>
-                <span className="text-xl font-black italic text-white">{completedLogModal.durationMinutes} min</span>
+
+              {/* Resumo das Métricas */}
+              <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-2 gap-3 text-left">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest block">Volume Total</span>
+                  <span className="text-xl font-black italic text-green-400">{completedLogModal.totalVolumeKg.toLocaleString('pt-BR')} kg</span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest block">Duração</span>
+                  <span className="text-xl font-black italic text-white">{completedLogModal.durationMinutes} min</span>
+                </div>
+              </div>
+
+              {/* Lista dos Exercícios Concluídos */}
+              <div className="bg-zinc-950 p-3.5 rounded-2xl border border-zinc-800 text-left space-y-2">
+                <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-widest block">
+                  Exercícios Realizados ({(completedLogModal.exercises || []).length}):
+                </span>
+                <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                  {(completedLogModal.exercises || []).map((ex, idx) => {
+                    const { setsCompleted, maxWeight, repsAtMax } = getExerciseLogSummary(ex);
+                    return (
+                      <div key={idx} className="bg-zinc-900 px-3 py-2 rounded-xl flex items-center justify-between text-xs border border-zinc-800/80">
+                        <span className="font-bold text-white truncate pr-2">{ex.exerciseName}</span>
+                        <div className="flex items-center gap-2 shrink-0 font-mono text-[11px]">
+                          <span className="text-zinc-400 font-bold">{setsCompleted} series</span>
+                          {maxWeight > 0 && (
+                            <span className="bg-green-500/20 text-green-300 px-2 py-0.5 rounded font-black border border-green-500/30">
+                              {maxWeight}kg x {repsAtMax}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-3">
+            {/* Ações */}
+            <div className="flex flex-col gap-2.5 shrink-0 pt-1 border-t border-zinc-800">
               {onOpenShareModal && (
                 <button
                   onClick={() => {
@@ -738,7 +792,7 @@ export const WorkoutExecutionView: React.FC<WorkoutExecutionViewProps> = ({
                   setCompletedLogModal(null);
                   onFinishWorkout(log);
                 }}
-                className="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-black uppercase tracking-wider py-3.5 rounded-2xl text-xs"
+                className="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-black uppercase tracking-wider py-3 rounded-2xl text-xs"
               >
                 Voltar ao Dashboard
               </button>

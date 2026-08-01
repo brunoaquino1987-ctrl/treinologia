@@ -107,7 +107,13 @@ export default function App() {
             />
             <Route
               path="/analytics"
-              element={<AnalyticsPage logs={logs} user={user} />}
+              element={
+                <AnalyticsPage
+                  logs={logs}
+                  user={user}
+                  onOpenShareModal={(log) => setShareModalLog(log)}
+                />
+              }
             />
             <Route
               path="/knee"

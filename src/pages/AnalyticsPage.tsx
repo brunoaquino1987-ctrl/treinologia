@@ -5,8 +5,9 @@ import { AnalyticsView } from '../components/AnalyticsView';
 interface AnalyticsPageProps {
   logs: WorkoutLog[];
   user: UserProfile;
+  onOpenShareModal?: (log: WorkoutLog) => void;
 }
 
-export function AnalyticsPage({ logs, user }: AnalyticsPageProps) {
-  return <AnalyticsView logs={logs} user={user} />;
+export function AnalyticsPage({ logs, user, onOpenShareModal }: AnalyticsPageProps) {
+  return <AnalyticsView logs={logs} user={user} onOpenShareModal={onOpenShareModal} />;
 }

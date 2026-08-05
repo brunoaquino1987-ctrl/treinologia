@@ -12,6 +12,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { WorkoutPage } from './pages/WorkoutPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { KneeRecoveryPage } from './pages/KneeRecoveryPage';
+import { PlyometricsPage } from './pages/PlyometricsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { ShareCardModal } from './components/ShareCardModal';
 
@@ -114,6 +115,10 @@ export default function App() {
                   onOpenShareModal={(log) => setShareModalLog(log)}
                 />
               }
+            />
+            <Route
+              path="/plyometrics"
+              element={<PlyometricsPage />}
             />
             <Route
               path="/knee"

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { EXERCISE_ALTERNATIVES_BY_MUSCLE } from '../data/exerciseAlternatives';
-import { Repeat, Search, Dumbbell, ShieldCheck, CheckCircle2, Info, Sparkles } from 'lucide-react';
+import { Repeat, Search, Dumbbell, ShieldCheck, CheckCircle2, Info, Sparkles, Zap, ChevronRight } from 'lucide-react';
 
 export const KneeRecoveryView: React.FC = () => {
   const [selectedMuscle, setSelectedMuscle] = useState<string>('Todos');
@@ -11,22 +12,35 @@ export const KneeRecoveryView: React.FC = () => {
   return (
     <div className="space-y-6 pb-20 max-w-5xl mx-auto">
       {/* Header do Guia */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-3 shadow-2xl relative overflow-hidden">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-2xl relative overflow-hidden">
         <div className="absolute -top-10 -right-10 w-60 h-60 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold">Catálogo de Substituições</p>
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-400 flex items-center justify-center shrink-0">
-            <Repeat className="w-6 h-6" />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold">Catálogo de Substituições</p>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-400 flex items-center justify-center shrink-0">
+                <Repeat className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-black uppercase italic tracking-tight text-white">
+                  Guia de Exercícios & Substitutos
+                </h2>
+                <p className="text-xs text-zinc-400 font-medium">
+                  Substitua qualquer exercício por alternativas do mesmo grupo muscular diretamente durante a execução do treino.
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase italic tracking-tight text-white">
-              Guia de Exercícios & Substitutos
-            </h2>
-            <p className="text-xs text-zinc-400 font-medium">
-              Substitua qualquer exercício por alternativas do mesmo grupo muscular diretamente durante a execução do treino.
-            </p>
-          </div>
+
+          <Link
+            to="/plyometrics"
+            className="bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 text-green-400 font-bold px-4 py-3 rounded-2xl text-xs flex items-center gap-2 shrink-0 transition-all"
+          >
+            <Zap className="w-4 h-4 text-green-400" />
+            <span>Pliometria LCA</span>
+            <ChevronRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
 

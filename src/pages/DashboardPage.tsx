@@ -13,7 +13,7 @@ interface DashboardPageProps {
 export function DashboardPage({ user, logs, workouts, onStartWorkout }: DashboardPageProps) {
   const navigate = useNavigate();
 
-  const handleNavigateTab = (tab: 'dashboard' | 'workout' | 'analytics' | 'knee' | 'settings') => {
+  const handleNavigateTab = (tab: 'dashboard' | 'workout' | 'analytics' | 'plyometrics' | 'knee' | 'settings') => {
     if (tab === 'dashboard') navigate('/');
     else navigate(`/${tab}`);
   };

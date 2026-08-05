@@ -2,14 +2,14 @@ import React from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { UserProfile } from '../types';
 import { CYCLE_WEEKS_CONFIG } from '../data/initialData';
-import { Dumbbell, Activity, LineChart, Repeat, Settings, TrendingUp } from 'lucide-react';
+import { Dumbbell, Activity, LineChart, Repeat, Settings, TrendingUp, Zap } from 'lucide-react';
 
 interface NavbarProps {
   user: UserProfile;
   isWorkoutActive: boolean;
   onStartWorkoutClick: () => void;
-  activeTab?: 'dashboard' | 'workout' | 'analytics' | 'knee' | 'settings';
-  setActiveTab?: (tab: 'dashboard' | 'workout' | 'analytics' | 'knee' | 'settings') => void;
+  activeTab?: 'dashboard' | 'workout' | 'analytics' | 'plyometrics' | 'knee' | 'settings';
+  setActiveTab?: (tab: 'dashboard' | 'workout' | 'analytics' | 'plyometrics' | 'knee' | 'settings') => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -23,11 +23,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   const location = useLocation();
 
   // Determine current active tab based on router location or prop
-  const getTabFromPath = (): 'dashboard' | 'workout' | 'analytics' | 'knee' | 'settings' => {
+  const getTabFromPath = (): 'dashboard' | 'workout' | 'analytics' | 'plyometrics' | 'knee' | 'settings' => {
     if (propActiveTab) return propActiveTab;
     const path = location.pathname;
     if (path.startsWith('/workout')) return 'workout';
     if (path.startsWith('/analytics')) return 'analytics';
+    if (path.startsWith('/plyometrics')) return 'plyometrics';
     if (path.startsWith('/knee') || path.startsWith('/exercises')) return 'knee';
     if (path.startsWith('/settings')) return 'settings';
     return 'dashboard';
@@ -35,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const activeTab = getTabFromPath();
 
-  const handleTabChange = (tab: 'dashboard' | 'workout' | 'analytics' | 'knee' | 'settings') => {
+  const handleTabChange = (tab: 'dashboard' | 'workout' | 'analytics' | 'plyometrics' | 'knee' | 'settings') => {
     if (propSetActiveTab) propSetActiveTab(tab);
     const targetPath = tab === 'dashboard' ? '/' : `/${tab}`;
     navigate(targetPath);
@@ -136,6 +137,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button
+            onClick={() => handleTabChange('plyometrics')}
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all ${
+              activeTab === 'plyometrics'
+                ? 'bg-green-500 text-black shadow-md font-black'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold'
+            }`}
+          >
+            <Zap className="w-4 h-4" />
+            Pliometria LCA
+          </button>
+
+          <button
             onClick={() => handleTabChange('knee')}
             className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all ${
               activeTab === 'knee'
@@ -216,6 +229,16 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <LineChart className="w-5 h-5" />
           Evolução
+        </button>
+
+        <button
+          onClick={() => handleTabChange('plyometrics')}
+          className={`flex flex-col items-center gap-1 p-2 rounded-xl text-[10px] uppercase font-black tracking-wider ${
+            activeTab === 'plyometrics' ? 'text-green-500' : 'text-zinc-400'
+          }`}
+        >
+          <Zap className="w-5 h-5" />
+          Pliometria
         </button>
 
         <button

@@ -2,6 +2,7 @@ import React from 'react';
 import { UserProfile, WorkoutLog, Workout } from '../types';
 import { getWorkoutStreakAndStats } from '../services/storageService';
 import { CYCLE_WEEKS_CONFIG } from '../data/initialData';
+import { GeminiSuggestionsCard } from './GeminiSuggestionsCard';
 import {
   Flame,
   ShieldCheck,
@@ -12,6 +13,7 @@ import {
   Dumbbell,
   Repeat,
   TrendingUp,
+  Zap,
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -19,7 +21,7 @@ interface DashboardViewProps {
   logs: WorkoutLog[];
   workouts: Workout[];
   onStartWorkout: (workoutId: 'push' | 'pull' | 'legs_a' | 'upper' | 'legs_b') => void;
-  onNavigateTab: (tab: 'dashboard' | 'workout' | 'analytics' | 'knee' | 'settings') => void;
+  onNavigateTab: (tab: 'dashboard' | 'workout' | 'analytics' | 'plyometrics' | 'knee' | 'settings') => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -108,6 +110,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Componente de Sugestões Inteligentes com Gemini AI */}
+      <GeminiSuggestionsCard
+        user={user}
+        logs={logs}
+        workouts={workouts}
+        suggestedWorkoutId={suggestedWorkout.id}
+        onStartWorkout={onStartWorkout}
+      />
 
       {/* Seção da Periodização do Ciclo (Semana 1 a 8) */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 space-y-4">
@@ -207,6 +218,36 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </p>
           <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Histórico total</p>
         </div>
+      </div>
+
+      {/* Protocolo de Pliometria LCA & Handebol Banner */}
+      <div className="bg-gradient-to-r from-zinc-900 via-zinc-900 to-green-950/40 border border-green-500/30 rounded-3xl p-6 sm:p-7 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-xl relative overflow-hidden">
+        <div className="space-y-2 max-w-2xl relative z-10">
+          <div className="flex items-center gap-2">
+            <span className="bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5" />
+              Retorno Seguro ao Esporte
+            </span>
+            <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
+              3 Fases • Absorção a Reatividade
+            </span>
+          </div>
+          <h3 className="text-xl sm:text-2xl font-black uppercase italic text-white tracking-tight">
+            Protocolo de Pliometria & Joelho (LCA)
+          </h3>
+          <p className="text-xs text-zinc-300 font-medium leading-relaxed">
+            Desenvolvido especificamente para atletas de handebol com reconstrução de LCA: treine a mecânica de aterrissagem, impulsão unipodal e mudanças de direção sem risco articular.
+          </p>
+        </div>
+
+        <button
+          onClick={() => onNavigateTab('plyometrics')}
+          className="bg-green-500 hover:bg-green-400 active:scale-95 text-black font-black uppercase tracking-wider px-6 py-3.5 rounded-2xl text-xs flex items-center gap-2 shrink-0 shadow-lg shadow-green-500/20 transition-all"
+        >
+          <Zap className="w-4 h-4 fill-black" />
+          <span>Acessar Pliometria</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Lista das Divisões de Treino (Push / Pull / Legs A / Upper / Legs B) */}
